@@ -11,55 +11,53 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
 @Slf4j
+@Component
 public class StatClient {
-
-    private final RestTemplate rest;
+    private final RestTemplate restTemplate;
     private final String statsServiceUri;
 
-    public StatClient(@Value("${statistics-server.url:http://localhost:9090}") String statsServiceUri,
-                      RestTemplate rest) {
-        this.rest = rest;
+    public StatClient(@Value("${stat-server.url:http://localhost:9090}") String statsServiceUri) {
         this.statsServiceUri = statsServiceUri;
+        this.restTemplate = new RestTemplate();
     }
 
     public void addHit(HitDto hitDto) {
-        String url = statsServiceUri + "/hit";
         HttpEntity<HitDto> requestEntity = new HttpEntity<>(hitDto);
-
-        log.info("POST-запрос отправлен по {}", url);
+        log.info("Отправка POST-запроса в StatServer: {}", hitDto);
         try {
-            rest.exchange(url, HttpMethod.POST, requestEntity, Object.class);
-            log.info("Выполнено");
+            restTemplate.exchange(statsServiceUri + "/hit", HttpMethod.POST, requestEntity, Void.class);
+            log.info("POST-запрос успешно выполнен.");
         } catch (Exception e) {
-            log.error("Ошибка при отправке запроса на {}", url, e);
+            log.error("Ошибка при отправке POST-запроса в StatServer", e);
         }
     }
 
-    public ResponseEntity<Object> getStats(String start, String end, String[] uris, boolean unique) {
-        StringBuilder pathBuilder = new StringBuilder(statsServiceUri + "/stats?start={start}&end={end}&unique={unique}");
+    public ResponseEntity<StatDto[]> getStats(String start, String end, String[] uris, boolean unique) {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("start", start);
         parameters.put("end", end);
         parameters.put("unique", unique);
 
+        StringBuilder pathBuilder = new StringBuilder(statsServiceUri)
+                .append("/stats?start={start}&end={end}&unique={unique}");
+
         if (uris != null && uris.length > 0) {
-            String joinedUris = String.join(",", uris);
-            parameters.put("uris", joinedUris);
+            parameters.put("uris", uris);
             pathBuilder.append("&uris={uris}");
         }
 
         String path = pathBuilder.toString();
-        log.info("GET-запрос отправлен по {}", path);
+        log.info("Отправка GET-запроса в StatServer: path={}, params={}", path, parameters);
 
         try {
-            ResponseEntity<Object> response = rest.getForEntity(path, Object.class, parameters);
-            log.info("Ответ: status={}, body={}", response.getStatusCode(), response.getBody());
+            ResponseEntity<StatDto[]> response = restTemplate.getForEntity(path, StatDto[].class, parameters);
+            log.info("Ответ от StatServer: status={}, body={}", response.getStatusCode(), response.getBody());
+
             return response;
         } catch (Exception e) {
-            log.error("Ошибка при выполнении запроса на {}", path, e);
-            return ResponseEntity.status(500).body("Ошибка при обращении к серверу");
+            log.error("Ошибка при отправке GET-запроса в StatServer", e);
+            return ResponseEntity.status(500).body(null);
         }
     }
 }
