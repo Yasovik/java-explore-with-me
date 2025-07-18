@@ -69,7 +69,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public void deleteCategory(long catId) {
-        if (categoryRepository.existsById(catId)) {
+        if (!categoryRepository.existsById(catId)) {
             throw new CategoryNotFoundException(catId);
         }
         if (eventRepository.countByCategoryId(catId) > 0) {

@@ -73,7 +73,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional
     public RequestDto cancelParticipationRequest(Long userId, Long requestId) {
-        if (userRepository.existsById(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException(userId);
         }
         Request request = requestRepository.findById(requestId)
@@ -89,7 +89,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<RequestDto> getParticipationRequests(Long userId) {
-        if (userRepository.existsById(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException(userId);
         }
 
@@ -100,7 +100,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<RequestDto> getParticipationRequestsForUserEvent(Long userId, Long eventId) {
-        if (userRepository.existsById(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException(userId);
         }
         List<Event> events = eventRepository.findByIdAndInitiatorId(eventId, userId);
@@ -117,7 +117,7 @@ public class RequestServiceImpl implements RequestService {
     @Transactional
     public EventRequestStatusUpdateResultDto changeParticipationRequestsStatus(Long userId, Long eventId,
                                                                                EventRequestStatusUpdateRequestDto dto) {
-        if (userRepository.existsById(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException(userId);
         }
         Event event = eventRepository.findById(eventId)
