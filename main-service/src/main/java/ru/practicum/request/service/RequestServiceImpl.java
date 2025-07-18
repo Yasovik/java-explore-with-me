@@ -28,7 +28,6 @@ import static ru.practicum.request.mapper.RequestMapper.toRequestDto;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class RequestServiceImpl implements RequestService {
 
     private final RequestRepository requestRepository;
@@ -36,6 +35,7 @@ public class RequestServiceImpl implements RequestService {
     private final EventRepository eventRepository;
 
     @Override
+    @Transactional
     public RequestDto createParticipationRequest(Long userId, Long eventId) {
 
         User user = userRepository.findById(userId)
@@ -71,10 +71,11 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public RequestDto cancelParticipationRequest(Long userId, Long requestId) {
-
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+        if (userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId);
+        }
         Request request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new ForbiddenException("Запрос не найден."));
 
@@ -88,8 +89,9 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<RequestDto> getParticipationRequests(Long userId) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+        if (userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId);
+        }
 
         return requestRepository.findByRequesterId(userId).stream()
                 .map(RequestMapper::toRequestDto)
@@ -98,8 +100,9 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<RequestDto> getParticipationRequestsForUserEvent(Long userId, Long eventId) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+        if (userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId);
+        }
         List<Event> events = eventRepository.findByIdAndInitiatorId(eventId, userId);
         if (events.isEmpty()) {
             throw new ForbiddenException("Пользователь не инициатор события.");
@@ -111,10 +114,12 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public EventRequestStatusUpdateResultDto changeParticipationRequestsStatus(Long userId, Long eventId,
                                                                                EventRequestStatusUpdateRequestDto dto) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+        if (userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId);
+        }
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException(eventId));
 

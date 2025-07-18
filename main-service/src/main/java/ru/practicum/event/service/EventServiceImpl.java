@@ -13,14 +13,22 @@ import ru.practicum.StatDto;
 import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryRepository;
 
-import ru.practicum.event.dto.*;
+import ru.practicum.event.dto.EventFullDto;
+import ru.practicum.event.dto.EventShortDto;
+import ru.practicum.event.dto.NewEventDto;
+import ru.practicum.event.dto.UpdateEventAdminRequestDto;
+import ru.practicum.event.dto.UpdateEventUserRequestDto;
 import ru.practicum.event.mapper.EventMapper;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.EventState;
 import ru.practicum.event.model.StateAdminAction;
 import ru.practicum.event.model.StateUserAction;
 import ru.practicum.event.repository.EventRepository;
-import ru.practicum.exceptions.*;
+import ru.practicum.exceptions.CategoryNotFoundException;
+import ru.practicum.exceptions.EventNotFoundException;
+import ru.practicum.exceptions.ForbiddenException;
+import ru.practicum.exceptions.UserNotFoundException;
+import ru.practicum.exceptions.ValidationRequestException;
 import ru.practicum.location.model.Location;
 import ru.practicum.location.repository.LocationRepository;
 import ru.practicum.user.model.User;
@@ -77,14 +85,18 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getEvents(Long userId, int from, int size) {
-        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        if(userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId);
+        }
         List<Event> events = eventRepository.findByInitiatorId(userId, PageRequest.of(from / size, size));
         return events.stream().map(EventMapper::toEventShortDto).collect(Collectors.toList());
     }
 
     @Override
     public EventFullDto getEventById(Long userId, Long eventId) {
-        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        if(userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId);
+        }
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
         return toEventFullDto(event);
     }
@@ -92,7 +104,9 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventUserRequestDto dto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        if(userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId);
+        }
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
 
         if (!Objects.equals(event.getInitiator().getId(), userId)) {

@@ -8,7 +8,6 @@ import ru.practicum.category.mapper.CategoryMapper;
 import ru.practicum.category.dto.NewCategoryDto;
 import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryRepository;
-import ru.practicum.event.model.Event;
 import ru.practicum.event.repository.EventRepository;
 import ru.practicum.exceptions.CategoryNotFoundException;
 import ru.practicum.exceptions.ConflictException;
@@ -70,10 +69,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public void deleteCategory(long catId) {
-        categoryRepository.findById(catId)
-                .orElseThrow(() -> new CategoryNotFoundException(catId));
-        Event event = eventRepository.findFirstByCategoryId(catId);
-        if (event != null) {
+        if (categoryRepository.existsById(catId)) {
+            throw new CategoryNotFoundException(catId);
+        }
+        if (eventRepository.countByCategoryId(catId) > 0) {
             throw new ForbiddenException("Категория не пустая");
         }
         categoryRepository.deleteById(catId);

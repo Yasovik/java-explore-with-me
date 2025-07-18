@@ -19,7 +19,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     List<Event> findByIdIn(List<Long> eventIds);
 
-    Event findFirstByCategoryId(Long catId);
+    long countByCategoryId(Long catId);
 
     @Query(value = """
             SELECT * FROM events e

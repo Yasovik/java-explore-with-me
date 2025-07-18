@@ -1,6 +1,18 @@
 package ru.practicum.event.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -52,9 +64,11 @@ public class Event {
     private boolean paid = false;
 
     @Column(name = "participant_limit", nullable = false)
+    @Builder.Default
     private int participantLimit = 0;
 
     @Column(name = "request_moderation", nullable = false)
+    @Builder.Default
     private boolean requestModeration = true;
 
     @Column(name = "created_on", nullable = false, updatable = false)
@@ -78,5 +92,6 @@ public class Event {
     private List<Request> requests;
 
     @Column(nullable = false, columnDefinition = "bigint default 0")
+    @Builder.Default
     private Long views = 0L;
 }

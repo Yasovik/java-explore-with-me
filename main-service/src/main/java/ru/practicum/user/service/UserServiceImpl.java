@@ -15,7 +15,6 @@ import static ru.practicum.user.mapper.UserMapper.toUserDto;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -32,11 +31,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto createUser(NewUserRequestDto newUserRequestDto) {
         return toUserDto(userRepository.save(toUser(newUserRequestDto)));
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
