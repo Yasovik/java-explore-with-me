@@ -85,7 +85,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getEvents(Long userId, int from, int size) {
-        if(userRepository.existsById(userId)) {
+        if (userRepository.existsById(userId)) {
             throw new UserNotFoundException(userId);
         }
         List<Event> events = eventRepository.findByInitiatorId(userId, PageRequest.of(from / size, size));
@@ -94,7 +94,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto getEventById(Long userId, Long eventId) {
-        if(userRepository.existsById(userId)) {
+        if (userRepository.existsById(userId)) {
             throw new UserNotFoundException(userId);
         }
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
@@ -104,7 +104,7 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventUserRequestDto dto) {
-        if(userRepository.existsById(userId)) {
+        if (userRepository.existsById(userId)) {
             throw new UserNotFoundException(userId);
         }
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
