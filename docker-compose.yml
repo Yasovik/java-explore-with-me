@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   stats-server:
     build: stat-service/stat-server
@@ -37,7 +35,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
-      - STAT_SERVER_URL=http://stat-server:9090
+      - STATSERVER_URL=http://stat-server:9090
 
   ewm-db:
     image: postgres:14-alpine
