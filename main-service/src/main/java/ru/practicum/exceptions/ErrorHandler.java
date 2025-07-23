@@ -44,7 +44,8 @@ public class ErrorHandler {
             UserNotFoundException.class,
             CategoryNotFoundException.class,
             EventNotFoundException.class,
-            RequestNotFoundException.class
+            RequestNotFoundException.class,
+            AccessDeniedException.class
     })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleEntityNotFoundException(EntityNotFoundException e) {

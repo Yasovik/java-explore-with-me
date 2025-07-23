@@ -10,6 +10,7 @@ import ru.practicum.comments.model.Comment;
 import ru.practicum.comments.repository.CommentRepository;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.repository.EventRepository;
+import ru.practicum.exceptions.AccessDeniedException;
 import ru.practicum.exceptions.CommentNotFoundException;
 import ru.practicum.exceptions.EventNotFoundException;
 import ru.practicum.exceptions.UserNotFoundException;
@@ -52,6 +53,10 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException(commentId));
 
+        if (!comment.getAuthorId().getId().equals(userId)) {
+            throw new AccessDeniedException(userId);
+        }
+
         comment.setText(dto.getText());
         comment.setUpdatedOn(LocalDateTime.now());
 
@@ -85,6 +90,10 @@ public class CommentServiceImpl implements CommentService {
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException(commentId));
+
+        if (!comment.getAuthorId().getId().equals(userId)) {
+            throw new AccessDeniedException(userId);
+        }
 
         commentRepository.delete(comment);
     }
